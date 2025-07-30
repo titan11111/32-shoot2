@@ -1,0 +1,127 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    font-family: sans-serif;
+    background-color: black;
+    color: white;
+  }
+  
+  #start-screen {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: black;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+  }
+  
+  #start-button {
+    padding: 10px 20px;
+    font-size: 24px;
+    margin-top: 20px;
+    cursor: pointer;
+  }
+  
+  #game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: none;
+  }
+  
+  #background {
+    position: absolute;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(to right, #000000, #111111);
+    animation: scrollBackground 10s linear infinite;
+  }
+  
+  @keyframes scrollBackground {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  
+  #player {
+    position: absolute;
+    left: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 60px;
+    height: 40px;
+    z-index: 5;
+  }
+  
+  .bullet, .bullet-strong {
+    position: absolute;
+    height: 4px;
+  }
+  .bullet {
+    width: 10px;
+    background: yellow;
+  }
+  .bullet-strong {
+    width: 20px;
+    background: cyan;
+  }
+  
+  .enemy, .enemy-strong {
+    position: absolute;
+    width: 40px;
+    height: 30px;
+    border-radius: 5px;
+  }
+  .enemy {
+    background: red;
+  }
+  .enemy-strong {
+    background: green;
+    width: 50px;
+    height: 40px;
+  }
+  
+  .explosion {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: orange;
+    border-radius: 50%;
+    animation: explode 0.3s ease-out forwards;
+    z-index: 10;
+  }
+  
+  @keyframes explode {
+    0% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(2);
+    }
+  }
+  
+  #score {
+    position: absolute;
+    top: 10px;
+    left: 20px;
+    font-size: 20px;
+    z-index: 10;
+  }
+  
+  #game-over {
+    display: none;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    color: red;
+    z-index: 20;
+  }
+  
