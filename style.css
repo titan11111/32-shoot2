@@ -56,6 +56,11 @@ body {
     height: 40px;
     z-index: 5;
   }
+  #player img {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
   
   .bullet, .bullet-strong {
     position: absolute;
@@ -70,22 +75,23 @@ body {
     background: cyan;
   }
   
-  .enemy, .enemy-strong {
+.enemy, .enemy-strong {
     position: absolute;
     border-radius: 5px;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
+    overflow: hidden;
   }
-  .enemy {
+.enemy {
     width: 40px;
     height: 30px;
-    background-image: url('images/enemy.svg');
   }
-  .enemy-strong {
+.enemy-strong {
     width: 50px;
     height: 40px;
-    background-image: url('images/enemy-strong.svg');
+  }
+.enemy img, .enemy-strong img {
+    width: 100%;
+    height: 100%;
+    display: block;
   }
   
   .explosion {

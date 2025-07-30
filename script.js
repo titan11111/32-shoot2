@@ -6,6 +6,35 @@ const bgm = document.getElementById('bgm');
 const startScreen = document.getElementById('start-screen');
 const startButton = document.getElementById('start-button');
 
+// ==== SVG キャッシュ機構 ====
+const svgCache = {};
+function getSvgImage(key, svgText) {
+  if (!svgCache[key]) {
+    const blob = new Blob([svgText], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.src = url;
+    img.onload = () => URL.revokeObjectURL(url);
+    svgCache[key] = img;
+  }
+  return svgCache[key].cloneNode();
+}
+
+// ==== SVG データ ====
+const PLAYER_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 60">
+  <polygon points="10,30 70,18 110,30 70,42" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <polygon points="50,20 80,30 50,40" fill="#bdc3c7"/>
+  <polygon points="20,15 45,30 20,45" fill="#ecf0f1"/>
+</svg>`;
+const ENEMY_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 30">
+  <ellipse cx="25" cy="20" rx="20" ry="8" fill="#e74c3c"/>
+  <ellipse cx="25" cy="10" rx="10" ry="5" fill="#c0392b"/>
+</svg>`;
+const ENEMY_STRONG_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 40">
+  <ellipse cx="30" cy="25" rx="25" ry="10" fill="#27ae60"/>
+  <ellipse cx="30" cy="12" rx="15" ry="8" fill="#2ecc71"/>
+</svg>`;
+
 let playerY = window.innerHeight / 2;
 const speed = 5;
 let keys = {};
@@ -17,6 +46,7 @@ let touchStartY = 0;
 startButton.addEventListener('click', () => {
   startScreen.style.display = 'none';
   gameContainer.style.display = 'block';
+  player.appendChild(getSvgImage('player', PLAYER_SVG));
   bgm.play();
   gameLoop();
   setInterval(spawnEnemy, 2000);
@@ -86,6 +116,12 @@ function spawnEnemy() {
   const type = Math.random() < 0.5 ? 'enemy' : 'enemy-strong';
   const enemy = document.createElement('div');
   enemy.classList.add(type);
+  enemy.appendChild(
+    getSvgImage(
+      type,
+      type === 'enemy' ? ENEMY_SVG : ENEMY_STRONG_SVG
+    )
+  );
   const enemyY = Math.random() * (window.innerHeight - 50);
   enemy.style.left = `${window.innerWidth}px`;
   enemy.style.top = `${enemyY}px`;
