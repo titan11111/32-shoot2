@@ -11,13 +11,11 @@ const svgCache = {};
 function getSvgImage(key, svgText) {
   if (!svgCache[key]) {
     const blob = new Blob([svgText], { type: 'image/svg+xml' });
-    const url = URL.createObjectURL(blob);
-    const img = new Image();
-    img.src = url;
-    img.onload = () => URL.revokeObjectURL(url);
-    svgCache[key] = img;
+    svgCache[key] = URL.createObjectURL(blob);
   }
-  return svgCache[key].cloneNode();
+  const img = new Image();
+  img.src = svgCache[key];
+  return img;
 }
 
 // ==== SVG データ ====
