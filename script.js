@@ -66,25 +66,30 @@ document.addEventListener('keyup', (e) => {
 
 // ==== スマホ：スワイプ上下移動／タップ発射 ====
 gameContainer.addEventListener('touchstart', (e) => {
+  e.preventDefault();
   touchStartY = e.touches[0].clientY;
-});
+}, { passive: false });
 gameContainer.addEventListener('touchmove', (e) => {
+  e.preventDefault();
   const currentY = e.touches[0].clientY;
   const delta = currentY - touchStartY;
   playerY += delta;
-  playerY = Math.max(0, Math.min(window.innerHeight - 40, playerY));
+  const playerHeight = player.offsetHeight;
+  playerY = Math.max(0, Math.min(window.innerHeight - playerHeight, playerY));
   player.style.top = `${playerY}px`;
   touchStartY = currentY;
-});
-gameContainer.addEventListener('touchend', () => {
+}, { passive: false });
+gameContainer.addEventListener('touchend', (e) => {
+  e.preventDefault();
   shoot('normal');
-});
+}, { passive: false });
 
 // ==== 自機移動 ====
 function movePlayer() {
   if (keys['ArrowUp']) playerY -= speed;
   if (keys['ArrowDown']) playerY += speed;
-  playerY = Math.max(0, Math.min(window.innerHeight - 40, playerY));
+  const playerHeight = player.offsetHeight;
+  playerY = Math.max(0, Math.min(window.innerHeight - playerHeight, playerY));
   player.style.top = `${playerY}px`;
 }
 
@@ -92,8 +97,8 @@ function movePlayer() {
 function shoot(type = 'normal') {
   const bullet = document.createElement('div');
   bullet.classList.add(type === 'strong' ? 'bullet-strong' : 'bullet');
-  bullet.style.left = `${player.offsetLeft + 60}px`;
-  bullet.style.top = `${player.offsetTop + 18}px`;
+  bullet.style.left = `${player.offsetLeft + player.offsetWidth}px`;
+  bullet.style.top = `${player.offsetTop + player.offsetHeight / 2 - 2}px`;
   gameContainer.appendChild(bullet);
 
   const interval = setInterval(() => {
