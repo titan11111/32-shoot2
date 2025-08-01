@@ -32,6 +32,7 @@ body {
     height: 100vh;
     overflow: hidden;
     display: none;
+    touch-action: none;
   }
   
   #background {
@@ -52,8 +53,8 @@ body {
     left: 50px;
     top: 50%;
     transform: translateY(-50%);
-    width: 60px;
-    height: 40px;
+    width: 120px;
+    height: 80px;
     z-index: 5;
   }
   #player img {
