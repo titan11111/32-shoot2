@@ -20,16 +20,21 @@ function getSvgImage(key, svgText) {
 }
 
 // ==== SVG データ ====
-const PLAYER_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 60">
+const PLAYER_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80">
   <defs>
-    <linearGradient id="playerGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#00c6ff"/>
-      <stop offset="100%" stop-color="#0072ff"/>
+    <linearGradient id="bodyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4facfe"/>
+      <stop offset="100%" stop-color="#00f2fe"/>
+    </linearGradient>
+    <linearGradient id="wingGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#43e97b"/>
+      <stop offset="100%" stop-color="#38f9d7"/>
     </linearGradient>
   </defs>
-  <polygon points="10,30 60,5 110,30 60,55" fill="url(#playerGrad)" stroke="#ffffff" stroke-width="2"/>
-  <polygon points="60,15 80,30 60,45 40,30" fill="#ffffff" opacity="0.6"/>
-  <circle cx="60" cy="30" r="6" fill="#f1c40f"/>
+  <polygon points="60,5 85,40 60,75 35,40" fill="url(#bodyGrad)" stroke="#ffffff" stroke-width="2"/>
+  <polygon points="5,33 60,23 115,33 115,47 60,57 5,47" fill="url(#wingGrad)" stroke="#ffffff" stroke-width="2"/>
+  <ellipse cx="60" cy="40" rx="10" ry="14" fill="#ffffff" opacity="0.6" stroke="#ffffff" stroke-width="1"/>
+  <polygon points="53,60 67,60 72,75 48,75" fill="url(#bodyGrad)" stroke="#ffffff" stroke-width="2"/>
 </svg>`;
 const ENEMY_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 40">
   <defs>
