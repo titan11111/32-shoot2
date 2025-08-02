@@ -105,7 +105,7 @@ startButton.addEventListener('click', () => {
   startScreen.style.display = 'none';
   gameContainer.style.display = 'block';
   player.appendChild(getSvgImage('player', PLAYER_SVG));
-  player.style.transform = 'none';
+  player.style.transform = 'rotate(90deg)';
   playerY = (window.innerHeight - player.offsetHeight) / 2;
   playerX = 50;
   player.style.top = `${playerY}px`;
@@ -205,7 +205,7 @@ function shoot(type = 'normal') {
 function spawnBullet(centerY) {
   const bullet = document.createElement('div');
   bullet.classList.add('bullet');
-  bullet.style.left = `${player.offsetLeft + player.offsetWidth}px`;
+  bullet.style.left = `${player.offsetLeft + player.offsetWidth - 50}px`;
   gameContainer.appendChild(bullet);
   bullet.style.top = `${centerY - bullet.offsetHeight / 2}px`;
   const interval = setInterval(() => {
@@ -223,7 +223,7 @@ function spawnBullet(centerY) {
 function spawnBeam() {
   const beam = document.createElement('div');
   beam.classList.add('beam');
-  beam.style.left = `${player.offsetLeft + player.offsetWidth}px`;
+  beam.style.left = `${player.offsetLeft + player.offsetWidth - 50}px`;
   gameContainer.appendChild(beam);
   beam.style.top = `${player.offsetTop + player.offsetHeight / 2 - beam.offsetHeight / 2}px`;
   const interval = setInterval(() => {
@@ -241,7 +241,7 @@ function spawnBeam() {
 function spawnHoming() {
   const bullet = document.createElement('div');
   bullet.classList.add('homing');
-  bullet.style.left = `${player.offsetLeft + player.offsetWidth}px`;
+  bullet.style.left = `${player.offsetLeft + player.offsetWidth - 50}px`;
   gameContainer.appendChild(bullet);
   bullet.style.top = `${player.offsetTop + player.offsetHeight / 2 - bullet.offsetHeight / 2}px`;
   const interval = setInterval(() => {
