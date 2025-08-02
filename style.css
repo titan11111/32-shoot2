@@ -65,14 +65,14 @@ body {
   
   .bullet, .bullet-strong {
     position: absolute;
-    height: 4px;
+    height: 6px;
   }
   .bullet {
-    width: 10px;
+    width: 15px;
     background: yellow;
   }
   .bullet-strong {
-    width: 20px;
+    width: 30px;
     background: cyan;
   }
   
@@ -145,8 +145,8 @@ body {
 
   .item {
     position: absolute;
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
   }
   .item img {
     width: 100%;
@@ -156,15 +156,15 @@ body {
 
   .beam {
     position: absolute;
-    width: 80px;
-    height: 8px;
+    width: 120px;
+    height: 12px;
     background: lime;
   }
 
   .homing {
     position: absolute;
-    width: 12px;
-    height: 12px;
+    width: 18px;
+    height: 18px;
     background: orange;
     border-radius: 50%;
   }
@@ -182,8 +182,8 @@ body {
 
   .enemy-bullet {
     position: absolute;
-    width: 20px;
-    height: 8px;
+    width: 30px;
+    height: 12px;
     background: red;
   }
   
