@@ -21,37 +21,74 @@ function getSvgImage(key, svgText) {
 
 // ==== SVG データ ====
 const PLAYER_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 60">
-  <polygon points="10,30 70,18 110,30 70,42" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
-  <polygon points="50,20 80,30 50,40" fill="#bdc3c7"/>
-  <polygon points="20,15 45,30 20,45" fill="#ecf0f1"/>
+  <defs>
+    <linearGradient id="playerGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#00c6ff"/>
+      <stop offset="100%" stop-color="#0072ff"/>
+    </linearGradient>
+  </defs>
+  <polygon points="10,30 60,5 110,30 60,55" fill="url(#playerGrad)" stroke="#ffffff" stroke-width="2"/>
+  <polygon points="60,15 80,30 60,45 40,30" fill="#ffffff" opacity="0.6"/>
+  <circle cx="60" cy="30" r="6" fill="#f1c40f"/>
 </svg>`;
-const ENEMY_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 30">
-  <ellipse cx="25" cy="20" rx="20" ry="8" fill="#e74c3c"/>
-  <ellipse cx="25" cy="10" rx="10" ry="5" fill="#c0392b"/>
+const ENEMY_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 40">
+  <defs>
+    <linearGradient id="enemyGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff9a9e"/>
+      <stop offset="100%" stop-color="#fad0c4"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="30" cy="20" rx="28" ry="15" fill="url(#enemyGrad)"/>
+  <circle cx="20" cy="20" r="4" fill="#2c3e50"/>
+  <circle cx="40" cy="20" r="4" fill="#2c3e50"/>
 </svg>`;
-const ENEMY_STRONG_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 40">
-  <ellipse cx="30" cy="25" rx="25" ry="10" fill="#27ae60"/>
-  <ellipse cx="30" cy="12" rx="15" ry="8" fill="#2ecc71"/>
+const ENEMY_STRONG_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 50">
+  <defs>
+    <linearGradient id="enemyStrongGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffd200"/>
+      <stop offset="100%" stop-color="#f7971e"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="35" cy="25" rx="30" ry="18" fill="url(#enemyStrongGrad)"/>
+  <rect x="20" y="12" width="30" height="26" fill="rgba(255,255,255,0.3)"/>
 </svg>`;
-const ENEMY_FAST_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 30">
-  <ellipse cx="25" cy="15" rx="20" ry="10" fill="#9b59b6"/>
-  <circle cx="25" cy="15" r="5" fill="#8e44ad"/>
+const ENEMY_FAST_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 40">
+  <defs>
+    <linearGradient id="enemyFastGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff00cc"/>
+      <stop offset="100%" stop-color="#333399"/>
+    </linearGradient>
+  </defs>
+  <polygon points="30,5 55,20 30,35 5,20" fill="url(#enemyFastGrad)"/>
 </svg>`;
-const ENEMY_SHOOTER_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 40">
-  <rect x="5" y="10" width="50" height="20" fill="#f1c40f" rx="5"/>
-  <circle cx="30" cy="20" r="6" fill="#f39c12"/>
+const ENEMY_SHOOTER_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 50">
+  <defs>
+    <linearGradient id="enemyShooterGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#84fab0"/>
+      <stop offset="100%" stop-color="#8fd3f4"/>
+    </linearGradient>
+  </defs>
+  <rect x="5" y="15" width="60" height="20" rx="5" fill="url(#enemyShooterGrad)"/>
+  <circle cx="35" cy="25" r="7" fill="#34495e"/>
 </svg>`;
-const ITEM_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
-  <circle cx="20" cy="20" r="18" fill="gold"/>
-  <polygon points="20,5 23,15 35,15 25,22 28,32 20,26 12,32 15,22 5,15 17,15" fill="orange"/>
+const ITEM_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
+  <defs>
+    <radialGradient id="itemGrad" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f5d142"/>
+    </radialGradient>
+  </defs>
+  <polygon points="25,2 31,18 48,18 34,29 39,46 25,36 11,46 16,29 2,18 19,18" fill="url(#itemGrad)" stroke="#e67e22" stroke-width="2"/>
 </svg>`;
 
 let playerY = window.innerHeight / 2;
+let playerX = 50;
 const speed = 5;
 let keys = {};
 let score = 0;
 let gameOver = false;
 let touchStartY = 0;
+let touchStartX = 0;
 let powerLevel = 0;
 let barrierHits = 0;
 let stage = 1;
@@ -65,7 +102,9 @@ startButton.addEventListener('click', () => {
   player.appendChild(getSvgImage('player', PLAYER_SVG));
   player.style.transform = 'none';
   playerY = (window.innerHeight - player.offsetHeight) / 2;
+  playerX = 50;
   player.style.top = `${playerY}px`;
+  player.style.left = `${playerX}px`;
   bgm.play();
   gameLoop();
   spawnEnemy();
@@ -90,16 +129,24 @@ document.addEventListener('keyup', (e) => {
 gameContainer.addEventListener('touchstart', (e) => {
   e.preventDefault();
   touchStartY = e.touches[0].clientY;
+  touchStartX = e.touches[0].clientX;
 }, { passive: false });
 gameContainer.addEventListener('touchmove', (e) => {
   e.preventDefault();
   const currentY = e.touches[0].clientY;
-  const delta = currentY - touchStartY;
-  playerY += delta;
+  const currentX = e.touches[0].clientX;
+  const deltaY = currentY - touchStartY;
+  const deltaX = currentX - touchStartX;
+  playerY += deltaY;
+  playerX += deltaX;
   const playerHeight = player.offsetHeight;
+  const playerWidth = player.offsetWidth;
   playerY = Math.max(0, Math.min(window.innerHeight - playerHeight, playerY));
+  playerX = Math.max(0, Math.min(window.innerWidth - playerWidth, playerX));
   player.style.top = `${playerY}px`;
+  player.style.left = `${playerX}px`;
   touchStartY = currentY;
+  touchStartX = currentX;
 }, { passive: false });
 gameContainer.addEventListener('touchend', (e) => {
   e.preventDefault();
@@ -110,9 +157,14 @@ gameContainer.addEventListener('touchend', (e) => {
 function movePlayer() {
   if (keys['ArrowUp']) playerY -= speed;
   if (keys['ArrowDown']) playerY += speed;
+  if (keys['ArrowLeft']) playerX -= speed;
+  if (keys['ArrowRight']) playerX += speed;
   const playerHeight = player.offsetHeight;
+  const playerWidth = player.offsetWidth;
   playerY = Math.max(0, Math.min(window.innerHeight - playerHeight, playerY));
+  playerX = Math.max(0, Math.min(window.innerWidth - playerWidth, playerX));
   player.style.top = `${playerY}px`;
+  player.style.left = `${playerX}px`;
 }
 
 // ==== 弾発射（種類指定） ====
@@ -149,8 +201,8 @@ function spawnBullet(centerY) {
   const bullet = document.createElement('div');
   bullet.classList.add('bullet');
   bullet.style.left = `${player.offsetLeft + player.offsetWidth}px`;
-  bullet.style.top = `${centerY - 2}px`;
   gameContainer.appendChild(bullet);
+  bullet.style.top = `${centerY - bullet.offsetHeight / 2}px`;
   const interval = setInterval(() => {
     const currentLeft = parseInt(bullet.style.left, 10);
     if (currentLeft > window.innerWidth) {
@@ -167,8 +219,8 @@ function spawnBeam() {
   const beam = document.createElement('div');
   beam.classList.add('beam');
   beam.style.left = `${player.offsetLeft + player.offsetWidth}px`;
-  beam.style.top = `${player.offsetTop + player.offsetHeight / 2 - 4}px`;
   gameContainer.appendChild(beam);
+  beam.style.top = `${player.offsetTop + player.offsetHeight / 2 - beam.offsetHeight / 2}px`;
   const interval = setInterval(() => {
     const currentLeft = parseInt(beam.style.left, 10);
     if (currentLeft > window.innerWidth) {
@@ -185,8 +237,8 @@ function spawnHoming() {
   const bullet = document.createElement('div');
   bullet.classList.add('homing');
   bullet.style.left = `${player.offsetLeft + player.offsetWidth}px`;
-  bullet.style.top = `${player.offsetTop + player.offsetHeight / 2 - 6}px`;
   gameContainer.appendChild(bullet);
+  bullet.style.top = `${player.offsetTop + player.offsetHeight / 2 - bullet.offsetHeight / 2}px`;
   const interval = setInterval(() => {
     const currentLeft = parseInt(bullet.style.left, 10);
     const currentTop = parseInt(bullet.style.top, 10);
@@ -214,8 +266,8 @@ function spawnEnemyBullet(x, y, speed = 6) {
   const bullet = document.createElement('div');
   bullet.classList.add('enemy-bullet');
   bullet.style.left = `${x}px`;
-  bullet.style.top = `${y - 4}px`;
   gameContainer.appendChild(bullet);
+  bullet.style.top = `${y - bullet.offsetHeight / 2}px`;
   const interval = setInterval(() => {
     const currentLeft = parseInt(bullet.style.left, 10);
     if (gameOver || currentLeft < -20) {
@@ -268,7 +320,13 @@ function spawnEnemy() {
   enemy.appendChild(getSvgImage(type, svgMap[type]));
   enemy.style.left = `${window.innerWidth}px`;
   gameContainer.appendChild(enemy);
-  enemy.style.top = `${Math.random() * (window.innerHeight - enemy.offsetHeight)}px`;
+  const amplitude = 20 + Math.random() * 40;
+  const baseTop = amplitude + Math.random() * (window.innerHeight - enemy.offsetHeight - amplitude * 2);
+  enemy.style.top = `${baseTop}px`;
+  enemy.dataset.baseTop = baseTop.toString();
+  enemy.dataset.angle = '0';
+  enemy.dataset.amp = amplitude.toString();
+  enemy.dataset.freq = (0.05 + Math.random() * 0.05).toString();
 
   let speedX = 3;
   let shootInterval = null;
@@ -279,7 +337,7 @@ function spawnEnemy() {
     }, 1500);
   } else if (type === 'enemy-fast') {
     speedX = 6;
-    enemy.dataset.vy = '3';
+    enemy.dataset.freq = (0.15 + Math.random() * 0.05).toString();
   } else if (type === 'enemy-shooter') {
     speedX = 2;
     shootInterval = setInterval(() => {
@@ -296,16 +354,12 @@ function spawnEnemy() {
       if (shootInterval) clearInterval(shootInterval);
     } else {
       enemy.style.left = `${currentLeft - speedX}px`;
-      if (enemy.dataset.vy) {
-        let vy = parseInt(enemy.dataset.vy, 10);
-        let newTop = parseInt(enemy.style.top, 10) + vy;
-        if (newTop <= 0 || newTop >= window.innerHeight - enemy.offsetHeight) {
-          vy = -vy;
-          enemy.dataset.vy = vy.toString();
-          newTop = parseInt(enemy.style.top, 10) + vy;
-        }
-        enemy.style.top = `${newTop}px`;
-      }
+      let angle = parseFloat(enemy.dataset.angle);
+      angle += parseFloat(enemy.dataset.freq);
+      enemy.dataset.angle = angle.toString();
+      const baseY = parseFloat(enemy.dataset.baseTop);
+      const amp = parseFloat(enemy.dataset.amp);
+      enemy.style.top = `${baseY + Math.sin(angle) * amp}px`;
       checkPlayerCollision(enemy, moveInterval);
     }
   }, 20);
