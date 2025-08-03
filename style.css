@@ -18,11 +18,17 @@ body {
     justify-content: center;
     z-index: 999;
   }
-  
+
+  #start-screen h1 {
+    font-size: 64px;
+    color: #ffcc00;
+    text-shadow: 0 0 10px #ff0000, 0 0 20px #ff7700, 0 0 30px #ffff00;
+  }
+
   #start-button {
-    padding: 10px 20px;
-    font-size: 24px;
-    margin-top: 20px;
+    padding: 20px 40px;
+    font-size: 48px;
+    margin-top: 40px;
     cursor: pointer;
   }
   
