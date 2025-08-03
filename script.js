@@ -99,6 +99,8 @@ let barrierHits = 0;
 let stage = 1;
 let enemySpawnInterval = 2000;
 let enemiesDestroyed = 0;
+let bossBattle = false;
+let bossCountdown = 60;
 
 // ==== ゲーム開始 ====
 startButton.addEventListener('click', () => {
@@ -114,6 +116,7 @@ startButton.addEventListener('click', () => {
   gameLoop();
   spawnEnemy();
   spawnItem();
+  startBossCountdown();
 });
 
 // ==== キー操作 ====
@@ -311,7 +314,7 @@ function checkEnemyBulletCollision(bullet, interval) {
 
 // ==== 敵生成（4種類） ====
 function spawnEnemy() {
-  if (gameOver) return;
+  if (gameOver || bossBattle) return;
   const types = ['enemy', 'enemy-strong', 'enemy-fast', 'enemy-shooter'];
   const type = types[Math.floor(Math.random() * types.length)];
   const enemy = document.createElement('div');
@@ -373,7 +376,7 @@ function spawnEnemy() {
 
 // ==== 弾と敵の衝突判定 ====
 function checkBulletCollision(bullet, interval, type) {
-  const enemies = document.querySelectorAll('.enemy, .enemy-strong, .enemy-fast, .enemy-shooter');
+  const enemies = document.querySelectorAll('.enemy, .enemy-strong, .enemy-fast, .enemy-shooter, .boss');
   const bulletRect = bullet.getBoundingClientRect();
 
   enemies.forEach(enemy => {
@@ -387,14 +390,21 @@ function checkBulletCollision(bullet, interval, type) {
       createExplosion(enemy.offsetLeft, enemy.offsetTop);
       if (enemy.shootInterval) clearInterval(enemy.shootInterval);
       enemy.remove();
-      const points = enemy.classList.contains('enemy-strong') || enemy.classList.contains('enemy-shooter')
-        ? 200
-        : enemy.classList.contains('enemy-fast')
-          ? 150
-          : 100;
+      let points;
+      if (enemy.classList.contains('boss')) {
+        points = 1000;
+        bossBattle = false;
+        setTimeout(spawnEnemy, enemySpawnInterval);
+      } else {
+        points = enemy.classList.contains('enemy-strong') || enemy.classList.contains('enemy-shooter')
+          ? 200
+          : enemy.classList.contains('enemy-fast')
+            ? 150
+            : 100;
+        enemiesDestroyed++;
+        checkStageProgress();
+      }
       updateScore(points);
-      enemiesDestroyed++;
-      checkStageProgress();
       if (type !== 'beam') {
         bullet.remove();
         clearInterval(interval);
@@ -482,7 +492,7 @@ function activateBarrier() {
 }
 
 function findNearestEnemy(x, y) {
-  const enemies = document.querySelectorAll('.enemy, .enemy-strong, .enemy-fast, .enemy-shooter');
+  const enemies = document.querySelectorAll('.enemy, .enemy-strong, .enemy-fast, .enemy-shooter, .boss');
   let nearest = null;
   let dist = Infinity;
   enemies.forEach(enemy => {
@@ -504,6 +514,41 @@ function checkStageProgress() {
     stageDisplay.textContent = `Stage: ${stage}`;
     enemySpawnInterval = Math.max(500, enemySpawnInterval - 300);
   }
+}
+
+function startBossCountdown() {
+  const countdownDisplay = document.getElementById('countdown');
+  countdownDisplay.textContent = `Boss in: ${bossCountdown}`;
+  const interval = setInterval(() => {
+    bossCountdown--;
+    if (bossCountdown > 0) {
+      countdownDisplay.textContent = `Boss in: ${bossCountdown}`;
+    } else {
+      clearInterval(interval);
+      countdownDisplay.textContent = 'Boss Battle!';
+      bossBattle = true;
+      spawnBoss();
+    }
+  }, 1000);
+}
+
+function spawnBoss() {
+  const boss = document.createElement('div');
+  boss.classList.add('boss');
+  boss.appendChild(getSvgImage('boss', ENEMY_STRONG_SVG));
+  boss.style.left = `${window.innerWidth}px`;
+  gameContainer.appendChild(boss);
+  boss.style.top = `${(window.innerHeight - boss.offsetHeight) / 2}px`;
+  const move = setInterval(() => {
+    const currentLeft = parseInt(boss.style.left, 10);
+    if (gameOver || currentLeft < -boss.offsetWidth) {
+      boss.remove();
+      clearInterval(move);
+    } else {
+      boss.style.left = `${currentLeft - 1}px`;
+      checkPlayerCollision(boss, move);
+    }
+  }, 20);
 }
 
 // ==== 爆発 ====
