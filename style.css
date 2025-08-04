@@ -26,10 +26,15 @@ body {
   }
 
   #start-button {
-    padding: 20px 40px;
-    font-size: 48px;
+    padding: 30px 60px;
+    font-size: 72px;
     margin-top: 40px;
     cursor: pointer;
+    background-color: #ffcc00;
+    color: black;
+    border: 3px solid #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #ff7700, 0 0 20px #ff0000;
   }
   
   #game-container {
