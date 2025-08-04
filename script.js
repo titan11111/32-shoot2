@@ -7,6 +7,17 @@ const bgm = document.getElementById('bgm');
 const startScreen = document.getElementById('start-screen');
 const startButton = document.getElementById('start-button');
 
+function playBGM(file, loop = true) {
+  bgm.pause();
+  bgm.src = `audio/${file}`;
+  bgm.loop = loop;
+  bgm.currentTime = 0;
+  bgm.play();
+}
+
+// Title screen BGM
+playBGM('title_bgm.mp3');
+
 // ==== SVG キャッシュ機構 ====
 const svgCache = {};
 function getSvgImage(key, svgText) {
@@ -112,7 +123,7 @@ startButton.addEventListener('click', () => {
   playerX = 50;
   player.style.top = `${playerY}px`;
   player.style.left = `${playerX}px`;
-  bgm.play();
+  playBGM('battle_bgm.mp3');
   gameLoop();
   spawnEnemy();
   spawnItem();
@@ -571,7 +582,7 @@ function updateScore(amount) {
 function endGame() {
   gameOver = true;
   gameOverDisplay.style.display = 'block';
-  bgm.pause();
+  playBGM('clear.mp3', false);
 }
 
 // ==== メインループ ====
