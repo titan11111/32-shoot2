@@ -6,6 +6,11 @@ const gameOverDisplay = document.getElementById('game-over');
 const bgm = document.getElementById('bgm');
 const startScreen = document.getElementById('start-screen');
 const startButton = document.getElementById('start-button');
+const background = document.getElementById('background');
+
+function setScrolling(active) {
+  background.style.animationPlayState = active ? 'running' : 'paused';
+}
 
 function playBGM(file, loop = true) {
   bgm.pause();
@@ -124,6 +129,7 @@ startButton.addEventListener('click', () => {
   player.style.top = `${playerY}px`;
   player.style.left = `${playerX}px`;
   playBGM('battle_bgm.mp3');
+  setScrolling(true);
   gameLoop();
   spawnEnemy();
   spawnItem();
@@ -405,7 +411,13 @@ function checkBulletCollision(bullet, interval, type) {
       if (enemy.classList.contains('boss')) {
         points = 1000;
         bossBattle = false;
+        setScrolling(true);
+        stage++;
+        stageDisplay.textContent = `Stage: ${stage}`;
+        bossCountdown = 60;
+        enemiesDestroyed = 0;
         setTimeout(spawnEnemy, enemySpawnInterval);
+        startBossCountdown();
       } else {
         points = enemy.classList.contains('enemy-strong') || enemy.classList.contains('enemy-shooter')
           ? 200
@@ -544,6 +556,7 @@ function startBossCountdown() {
 }
 
 function spawnBoss() {
+  setScrolling(false);
   const boss = document.createElement('div');
   boss.classList.add('boss');
   boss.appendChild(getSvgImage('boss', ENEMY_STRONG_SVG));
