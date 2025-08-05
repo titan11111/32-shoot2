@@ -179,7 +179,7 @@ body {
 
   .beam {
     position: absolute;
-    width: 200px;
+    width: 300px;
     height: 16px;
     background: linear-gradient(90deg, rgba(255,255,255,0.9), #0ff, rgba(255,255,255,0.9));
     box-shadow: 0 0 8px #0ff, 0 0 16px #0ff, 0 0 24px #0ff;
