@@ -547,8 +547,9 @@ function spawnBoss() {
   const boss = document.createElement('div');
   boss.classList.add('boss');
   boss.appendChild(getSvgImage('boss', ENEMY_STRONG_SVG));
-  boss.style.left = `${window.innerWidth}px`;
   gameContainer.appendChild(boss);
+  // Start the boss off-screen to avoid stray bullets destroying it immediately
+  boss.style.left = `${window.innerWidth + boss.offsetWidth}px`;
   boss.style.top = `${(window.innerHeight - boss.offsetHeight) / 2}px`;
   const move = setInterval(() => {
     const currentLeft = parseInt(boss.style.left, 10);
