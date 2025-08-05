@@ -219,7 +219,7 @@ function shoot(type = 'normal') {
 function spawnBullet(centerY) {
   const bullet = document.createElement('div');
   bullet.classList.add('bullet');
-  bullet.style.left = `${player.offsetLeft + player.offsetWidth - 50}px`;
+  bullet.style.left = `${player.offsetLeft + player.offsetWidth - 35}px`;
   gameContainer.appendChild(bullet);
   bullet.style.top = `${centerY - bullet.offsetHeight / 2}px`;
   const interval = setInterval(() => {
@@ -237,7 +237,7 @@ function spawnBullet(centerY) {
 function spawnBeam() {
   const beam = document.createElement('div');
   beam.classList.add('beam');
-  beam.style.left = `${player.offsetLeft + player.offsetWidth - 50}px`;
+  beam.style.left = `${player.offsetLeft + player.offsetWidth - 35}px`;
   gameContainer.appendChild(beam);
   beam.style.top = `${player.offsetTop + player.offsetHeight / 2 - beam.offsetHeight / 2}px`;
   const interval = setInterval(() => {
@@ -246,7 +246,7 @@ function spawnBeam() {
       beam.remove();
       clearInterval(interval);
     } else {
-      beam.style.left = `${currentLeft + 12}px`;
+      beam.style.left = `${currentLeft + 16}px`;
       checkBulletCollision(beam, interval, 'beam');
     }
   }, 16);
@@ -255,7 +255,7 @@ function spawnBeam() {
 function spawnHoming() {
   const bullet = document.createElement('div');
   bullet.classList.add('homing');
-  bullet.style.left = `${player.offsetLeft + player.offsetWidth - 50}px`;
+  bullet.style.left = `${player.offsetLeft + player.offsetWidth - 35}px`;
   gameContainer.appendChild(bullet);
   bullet.style.top = `${player.offsetTop + player.offsetHeight / 2 - bullet.offsetHeight / 2}px`;
   const interval = setInterval(() => {
