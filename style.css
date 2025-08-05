@@ -64,8 +64,8 @@ body {
     left: 50px;
     top: 50%;
     transform: translateY(-50%);
-    width: 240px;
-    height: 160px;
+    width: 168px;
+    height: 112px;
     z-index: 5;
   }
   #player img {
@@ -179,9 +179,17 @@ body {
 
   .beam {
     position: absolute;
-    width: 120px;
-    height: 12px;
-    background: lime;
+    width: 200px;
+    height: 16px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.9), #0ff, rgba(255,255,255,0.9));
+    box-shadow: 0 0 8px #0ff, 0 0 16px #0ff, 0 0 24px #0ff;
+    border-radius: 8px;
+    animation: beamGlow 0.3s alternate infinite;
+  }
+
+  @keyframes beamGlow {
+    from { box-shadow: 0 0 8px #0ff, 0 0 16px #0ff, 0 0 24px #0ff; }
+    to { box-shadow: 0 0 16px #0ff, 0 0 32px #0ff, 0 0 48px #0ff; }
   }
 
   .homing {
@@ -196,8 +204,8 @@ body {
     position: absolute;
     top: -10px;
     left: -10px;
-    width: 260px;
-    height: 180px;
+    width: 188px;
+    height: 132px;
     border: 3px solid cyan;
     border-radius: 50%;
     pointer-events: none;
