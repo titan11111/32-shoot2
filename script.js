@@ -3,10 +3,14 @@ const gameContainer = document.getElementById('game-container');
 const scoreDisplay = document.getElementById('score');
 const stageDisplay = document.getElementById('stage');
 const gameOverDisplay = document.getElementById('game-over');
+const finalScoreDisplay = document.getElementById('final-score');
+const restartButton = document.getElementById('restart-button');
+const titleButton = document.getElementById('title-button');
 const bgm = document.getElementById('bgm');
 const startScreen = document.getElementById('start-screen');
 const startButton = document.getElementById('start-button');
 const background = document.getElementById('background');
+const overlay = document.getElementById('overlay');
 
 function setScrolling(active) {
   background.style.animationPlayState = active ? 'running' : 'paused';
@@ -103,7 +107,7 @@ const ITEM_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
 </svg>`;
 
 let playerY = window.innerHeight / 2;
-let playerX = 50;
+let playerX = window.innerWidth * 0.2;
 const speed = 5;
 let keys = {};
 let score = 0;
@@ -117,24 +121,56 @@ let enemySpawnInterval = 2000;
 let enemiesDestroyed = 0;
 let bossBattle = false;
 let bossCountdown = 60;
+let bossInterval;
 
-// ==== ゲーム開始 ====
-startButton.addEventListener('click', () => {
+function startGame() {
   startScreen.style.display = 'none';
+  gameOverDisplay.style.display = 'none';
+  overlay.style.display = 'none';
+  overlay.classList.remove('flash');
   gameContainer.style.display = 'block';
+  scoreDisplay.style.display = 'block';
+  stageDisplay.style.display = 'block';
+  document.getElementById('countdown').style.display = 'block';
+
+  score = 0;
+  stage = 1;
+  enemySpawnInterval = 2000;
+  enemiesDestroyed = 0;
+  bossBattle = false;
+  bossCountdown = 60;
+  if (bossInterval) clearInterval(bossInterval);
+  powerLevel = 0;
+  barrierHits = 0;
+
+  scoreDisplay.textContent = 'Score: 0';
+  stageDisplay.textContent = 'Stage: 1';
+  document.getElementById('countdown').textContent = '';
+  finalScoreDisplay.textContent = '';
+
+  document.querySelectorAll('.enemy, .enemy-strong, .enemy-fast, .enemy-shooter, .boss, .bullet, .bullet-strong, .beam, .homing, .enemy-bullet, .item, .explosion').forEach(e => e.remove());
+
+  player.innerHTML = '';
   player.appendChild(getSvgImage('player', PLAYER_SVG));
   player.style.transform = 'rotate(90deg)';
+  player.style.display = 'block';
   playerY = (window.innerHeight - player.offsetHeight) / 2;
-  playerX = 50;
+  playerX = window.innerWidth * 0.2;
   player.style.top = `${playerY}px`;
   player.style.left = `${playerX}px`;
+
   playBGM('battle_bgm.mp3');
   setScrolling(true);
+  gameOver = false;
   gameLoop();
   spawnEnemy();
   spawnItem();
   startBossCountdown();
-});
+}
+
+startButton.addEventListener('click', startGame);
+restartButton.addEventListener('click', startGame);
+titleButton.addEventListener('click', () => { location.reload(); });
 
 // ==== キー操作 ====
 document.addEventListener('keydown', (e) => {
@@ -323,8 +359,7 @@ function checkEnemyBulletCollision(bullet, interval) {
         if (b) b.remove();
       }
     } else {
-      createExplosion(player.offsetLeft, player.offsetTop);
-      endGame();
+      playerDeath();
     }
   }
 }
@@ -458,8 +493,7 @@ function checkPlayerCollision(enemy, interval) {
         if (b) b.remove();
       }
     } else {
-      createExplosion(player.offsetLeft, player.offsetTop);
-      endGame();
+      playerDeath();
     }
   }
 }
@@ -514,6 +548,12 @@ function activateBarrier() {
   barrierHits = 3;
 }
 
+function playerDeath() {
+  player.style.display = 'none';
+  createExplosion(player.offsetLeft, player.offsetTop);
+  endGame();
+}
+
 function findNearestEnemy(x, y) {
   const enemies = document.querySelectorAll('.enemy, .enemy-strong, .enemy-fast, .enemy-shooter, .boss');
   let nearest = null;
@@ -542,12 +582,12 @@ function checkStageProgress() {
 function startBossCountdown() {
   const countdownDisplay = document.getElementById('countdown');
   countdownDisplay.textContent = `Boss in: ${bossCountdown}`;
-  const interval = setInterval(() => {
+  bossInterval = setInterval(() => {
     bossCountdown--;
     if (bossCountdown > 0) {
       countdownDisplay.textContent = `Boss in: ${bossCountdown}`;
     } else {
-      clearInterval(interval);
+      clearInterval(bossInterval);
       countdownDisplay.textContent = 'Boss Battle!';
       bossBattle = true;
       spawnBoss();
@@ -594,9 +634,20 @@ function updateScore(amount) {
 
 // ==== ゲームオーバー ====
 function endGame() {
+  if (gameOver) return;
   gameOver = true;
-  gameOverDisplay.style.display = 'block';
+  setScrolling(false);
+  scoreDisplay.style.display = 'none';
+  stageDisplay.style.display = 'none';
+  document.getElementById('countdown').style.display = 'none';
+  if (bossInterval) clearInterval(bossInterval);
+  overlay.style.display = 'block';
+  overlay.classList.add('flash');
   playBGM('clear.mp3', false);
+  setTimeout(() => {
+    gameOverDisplay.style.display = 'flex';
+    finalScoreDisplay.textContent = `Final Score: ${score}`;
+  }, 1000);
 }
 
 // ==== メインループ ====
