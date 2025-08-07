@@ -11,6 +11,10 @@ const startScreen = document.getElementById('start-screen');
 const startButton = document.getElementById('start-button');
 const background = document.getElementById('background');
 const overlay = document.getElementById('overlay');
+const bgmToggle = document.getElementById('bgm-toggle');
+
+let difficulty = 'normal';
+let bossHPBase = 100;
 
 function setScrolling(active) {
   background.style.animationPlayState = active ? 'running' : 'paused';
@@ -135,7 +139,17 @@ function startGame() {
 
   score = 0;
   stage = 1;
-  enemySpawnInterval = 2000;
+  difficulty = document.getElementById('difficulty').value;
+  if (difficulty === 'easy') {
+    enemySpawnInterval = 2500;
+    bossHPBase = 80;
+  } else if (difficulty === 'hard') {
+    enemySpawnInterval = 1500;
+    bossHPBase = 150;
+  } else {
+    enemySpawnInterval = 2000;
+    bossHPBase = 100;
+  }
   enemiesDestroyed = 0;
   bossBattle = false;
   bossCountdown = 60;
@@ -160,6 +174,7 @@ function startGame() {
   player.style.left = `${playerX}px`;
 
   playBGM('battle_bgm.mp3');
+  bgmToggle.textContent = bgm.muted ? 'BGM: OFF' : 'BGM: ON';
   setScrolling(true);
   gameOver = false;
   gameLoop();
@@ -171,6 +186,12 @@ function startGame() {
 startButton.addEventListener('click', startGame);
 restartButton.addEventListener('click', startGame);
 titleButton.addEventListener('click', () => { location.reload(); });
+restartButton.addEventListener('touchstart', (e) => { e.preventDefault(); startGame(); }, { passive: false });
+titleButton.addEventListener('touchstart', () => { location.reload(); });
+bgmToggle.addEventListener('click', () => {
+  bgm.muted = !bgm.muted;
+  bgmToggle.textContent = bgm.muted ? 'BGM: OFF' : 'BGM: ON';
+});
 
 // ==== キー操作 ====
 document.addEventListener('keydown', (e) => {
@@ -188,11 +209,13 @@ document.addEventListener('keyup', (e) => {
 
 // ==== スマホ：スワイプ上下移動／タップ発射 ====
 gameContainer.addEventListener('touchstart', (e) => {
+  if (e.target.closest('#game-over')) return;
   e.preventDefault();
   touchStartY = e.touches[0].clientY;
   touchStartX = e.touches[0].clientX;
 }, { passive: false });
 gameContainer.addEventListener('touchmove', (e) => {
+  if (e.target.closest('#game-over')) return;
   e.preventDefault();
   const currentY = e.touches[0].clientY;
   const currentX = e.touches[0].clientX;
@@ -210,6 +233,7 @@ gameContainer.addEventListener('touchmove', (e) => {
   touchStartX = currentX;
 }, { passive: false });
 gameContainer.addEventListener('touchend', (e) => {
+  if (e.target.closest('#game-over')) return;
   e.preventDefault();
   shoot('normal');
 }, { passive: false });
@@ -439,30 +463,38 @@ function checkBulletCollision(bullet, interval, type) {
       bulletRect.top < enemyRect.bottom &&
       bulletRect.bottom > enemyRect.top
     ) {
-      createExplosion(enemy.offsetLeft, enemy.offsetTop);
-      if (enemy.shootInterval) clearInterval(enemy.shootInterval);
-      enemy.remove();
-      let points;
       if (enemy.classList.contains('boss')) {
-        points = 1000;
-        bossBattle = false;
-        setScrolling(true);
-        stage++;
-        stageDisplay.textContent = `Stage: ${stage}`;
-        bossCountdown = 60;
-        enemiesDestroyed = 0;
-        setTimeout(spawnEnemy, enemySpawnInterval);
-        startBossCountdown();
+        let hp = parseInt(enemy.dataset.hp, 10);
+        hp -= type === 'beam' ? 20 : 10;
+        enemy.dataset.hp = hp.toString();
+        createExplosion(enemy.offsetLeft, enemy.offsetTop);
+        if (hp <= 0) {
+          if (enemy.shootInterval) clearInterval(enemy.shootInterval);
+          enemy.remove();
+          let points = 1000;
+          bossBattle = false;
+          setScrolling(true);
+          stage++;
+          stageDisplay.textContent = `Stage: ${stage}`;
+          bossCountdown = 60;
+          enemiesDestroyed = 0;
+          setTimeout(spawnEnemy, enemySpawnInterval);
+          startBossCountdown();
+          updateScore(points);
+        }
       } else {
-        points = enemy.classList.contains('enemy-strong') || enemy.classList.contains('enemy-shooter')
+        createExplosion(enemy.offsetLeft, enemy.offsetTop);
+        if (enemy.shootInterval) clearInterval(enemy.shootInterval);
+        enemy.remove();
+        let points = enemy.classList.contains('enemy-strong') || enemy.classList.contains('enemy-shooter')
           ? 200
           : enemy.classList.contains('enemy-fast')
             ? 150
             : 100;
         enemiesDestroyed++;
         checkStageProgress();
+        updateScore(points);
       }
-      updateScore(points);
       if (type !== 'beam') {
         bullet.remove();
         clearInterval(interval);
@@ -601,6 +633,7 @@ function spawnBoss() {
   boss.classList.add('boss');
   boss.appendChild(getSvgImage('boss', ENEMY_STRONG_SVG));
   gameContainer.appendChild(boss);
+  boss.dataset.hp = (bossHPBase + (stage - 1) * 50).toString();
   // Start the boss off-screen to avoid stray bullets destroying it immediately
   boss.style.left = `${window.innerWidth + boss.offsetWidth}px`;
   boss.style.top = `${(window.innerHeight - boss.offsetHeight) / 2}px`;
@@ -614,6 +647,17 @@ function spawnBoss() {
       checkPlayerCollision(boss, move);
     }
   }, 20);
+
+  const attack = () => {
+    if (gameOver) return;
+    boss.classList.add('warning');
+    setTimeout(() => {
+      boss.classList.remove('warning');
+      spawnEnemyBullet(boss.offsetLeft, boss.offsetTop + boss.offsetHeight / 2, 8);
+    }, 500);
+  };
+  const shootInterval = setInterval(attack, 1500);
+  boss.shootInterval = shootInterval;
 }
 
 // ==== 爆発 ====
@@ -646,7 +690,13 @@ function endGame() {
   playBGM('clear.mp3', false);
   setTimeout(() => {
     gameOverDisplay.style.display = 'flex';
-    finalScoreDisplay.textContent = `Final Score: ${score}`;
+    const highScore = parseInt(localStorage.getItem('highScore') || '0', 10);
+    if (score > highScore) {
+      localStorage.setItem('highScore', score);
+      finalScoreDisplay.textContent = `Final Score: ${score} - High Score 更新!`;
+    } else {
+      finalScoreDisplay.textContent = `Final Score: ${score} (High Score: ${highScore})`;
+    }
   }, 1000);
 }
 

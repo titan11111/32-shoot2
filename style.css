@@ -19,6 +19,16 @@ body {
     z-index: 999;
   }
 
+  #instructions {
+    margin-top: 20px;
+    font-size: 24px;
+  }
+
+  #difficulty {
+    margin-top: 10px;
+    font-size: 24px;
+  }
+
   #start-screen h1 {
     font-size: 100px;
     color: #ffcc00;
@@ -155,6 +165,15 @@ body {
     font-size: 20px;
     z-index: 10;
   }
+
+  #bgm-toggle {
+    position: absolute;
+    top: 40px;
+    right: 20px;
+    z-index: 10;
+    padding: 5px 10px;
+    font-size: 16px;
+  }
   
   #game-over {
     display: none;
@@ -262,5 +281,14 @@ body {
     width: 30px;
     height: 12px;
     background: red;
+  }
+
+  .boss.warning {
+    animation: bossFlash 0.5s steps(2, start);
+  }
+
+  @keyframes bossFlash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
   }
   
