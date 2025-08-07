@@ -9,6 +9,13 @@
   <!-- スタート画面 -->
   <div id="start-screen">
     <h1>ギャラクシー<br>ストライカーX</h1>
+    <p id="instructions">操作: ←→キーで移動 / Spaceでショット</p>
+    <label for="difficulty">難易度:</label>
+    <select id="difficulty">
+      <option value="easy">EASY</option>
+      <option value="normal" selected>NORMAL</option>
+      <option value="hard">HARD</option>
+    </select>
     <button id="start-button">スタート</button>
   </div>
 
@@ -18,6 +25,7 @@
     <div id="score">Score: 0</div>
     <div id="stage">Stage: 1</div>
     <div id="countdown"></div>
+    <button id="bgm-toggle">BGM: ON</button>
     <div id="overlay"></div>
     <div id="player"></div>
     <div id="game-over">
