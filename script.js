@@ -470,6 +470,7 @@ function checkBulletCollision(bullet, interval, type) {
         createExplosion(enemy.offsetLeft, enemy.offsetTop);
         if (hp <= 0) {
           if (enemy.shootInterval) clearInterval(enemy.shootInterval);
+          if (enemy.moveInterval) clearInterval(enemy.moveInterval);
           enemy.remove();
           let points = 1000;
           bossBattle = false;
@@ -634,19 +635,26 @@ function spawnBoss() {
   boss.appendChild(getSvgImage('boss', ENEMY_STRONG_SVG));
   gameContainer.appendChild(boss);
   boss.dataset.hp = (bossHPBase + (stage - 1) * 50).toString();
-  // Start the boss off-screen to avoid stray bullets destroying it immediately
-  boss.style.left = `${window.innerWidth + boss.offsetWidth}px`;
+
+  // Start just outside the right edge and move into view, then stay put
+  const targetLeft = window.innerWidth - boss.offsetWidth - 50;
+  boss.style.left = `${window.innerWidth}px`;
   boss.style.top = `${(window.innerHeight - boss.offsetHeight) / 2}px`;
   const move = setInterval(() => {
     const currentLeft = parseInt(boss.style.left, 10);
-    if (gameOver || currentLeft < -boss.offsetWidth) {
+    if (gameOver) {
       boss.remove();
       clearInterval(move);
     } else {
-      boss.style.left = `${currentLeft - 1}px`;
+      if (currentLeft > targetLeft) {
+        boss.style.left = `${currentLeft - 1}px`;
+      } else {
+        boss.style.left = `${targetLeft}px`;
+      }
       checkPlayerCollision(boss, move);
     }
   }, 20);
+  boss.moveInterval = move;
 
   const attack = () => {
     if (gameOver) return;
