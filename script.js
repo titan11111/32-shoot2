@@ -475,6 +475,7 @@ function checkBulletCollision(bullet, interval, type) {
           let points = 1000;
           bossBattle = false;
           setScrolling(true);
+          playBGM('battle_bgm.mp3');
           stage++;
           stageDisplay.textContent = `Stage: ${stage}`;
           bossCountdown = 60;
@@ -623,6 +624,7 @@ function startBossCountdown() {
       clearInterval(bossInterval);
       countdownDisplay.textContent = 'Boss Battle!';
       bossBattle = true;
+      playBGM('boss_bgm.mp3');
       spawnBoss();
     }
   }, 1000);
