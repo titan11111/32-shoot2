@@ -60,10 +60,11 @@ body {
     position: absolute;
     width: 200%;
     height: 100%;
-    background: linear-gradient(to right, #000000, #111111);
-    animation: scrollBackground 10s linear infinite;
+    background: url("images/volcano.svg") repeat-x bottom;
+    background-size: cover;
+    animation: scrollBackground 20s linear infinite;
   }
-  
+
   @keyframes scrollBackground {
     0% { transform: translateX(0); }
     100% { transform: translateX(-50%); }
