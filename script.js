@@ -650,6 +650,10 @@ function spawnBoss() {
         boss.style.left = `${currentLeft - 1}px`;
       } else {
         boss.style.left = `${targetLeft}px`;
+        clearInterval(move);
+        boss.homeX = targetLeft;
+        boss.homeY = parseInt(boss.style.top, 10);
+        startBossPatterns(boss);
       }
       checkPlayerCollision(boss, move);
     }
@@ -666,6 +670,76 @@ function spawnBoss() {
   };
   const shootInterval = setInterval(attack, 1500);
   boss.shootInterval = shootInterval;
+}
+
+function startBossPatterns(boss) {
+  const patterns = [bossPatternVertical, bossPatternCharge, bossPatternZigzag];
+  const runNext = () => {
+    if (gameOver || !document.body.contains(boss)) return;
+    const p = patterns[Math.floor(Math.random() * patterns.length)];
+    p(boss, () => setTimeout(runNext, 500));
+  };
+  runNext();
+}
+
+function bossPatternVertical(boss, done) {
+  let dir = Math.random() < 0.5 ? -1 : 1;
+  const interval = setInterval(() => {
+    if (gameOver) { clearInterval(interval); return; }
+    let top = parseInt(boss.style.top, 10) + dir * 3;
+    if (top < 0 || top > window.innerHeight - boss.offsetHeight) dir *= -1;
+    boss.style.top = `${top}px`;
+    checkPlayerCollision(boss, interval);
+  }, 20);
+  setTimeout(() => { clearInterval(interval); done(); }, 3000);
+}
+
+function bossPatternCharge(boss, done) {
+  boss.classList.add('warning');
+  setTimeout(() => {
+    boss.classList.remove('warning');
+    let phase = 'forward';
+    const interval = setInterval(() => {
+      if (gameOver) { clearInterval(interval); return; }
+      let left = parseInt(boss.style.left, 10);
+      let top = parseInt(boss.style.top, 10);
+      if (phase === 'forward') {
+        left -= 12;
+        const targetY = player.offsetTop + player.offsetHeight / 2 - boss.offsetHeight / 2;
+        top += Math.sign(targetY - top) * 4;
+        if (left <= playerX) phase = 'back';
+      } else {
+        left += 12;
+        if (left >= boss.homeX) { left = boss.homeX; phase = 'done'; }
+      }
+      boss.style.left = `${left}px`;
+      boss.style.top = `${top}px`;
+      checkPlayerCollision(boss, interval);
+      if (phase === 'done') { clearInterval(interval); done(); }
+    }, 20);
+  }, 500);
+}
+
+function bossPatternZigzag(boss, done) {
+  let dirX = -1;
+  let dirY = Math.random() < 0.5 ? -1 : 1;
+  const minX = boss.homeX - 100;
+  const maxX = boss.homeX;
+  const interval = setInterval(() => {
+    if (gameOver) { clearInterval(interval); return; }
+    let left = parseInt(boss.style.left, 10) + dirX * 4;
+    let top = parseInt(boss.style.top, 10) + dirY * 4;
+    if (left <= minX || left >= maxX) dirX *= -1;
+    if (top <= 0 || top >= window.innerHeight - boss.offsetHeight) dirY *= -1;
+    boss.style.left = `${left}px`;
+    boss.style.top = `${top}px`;
+    checkPlayerCollision(boss, interval);
+  }, 20);
+  setTimeout(() => {
+    clearInterval(interval);
+    boss.style.left = `${boss.homeX}px`;
+    done();
+  }, 3000);
 }
 
 // ==== 爆発 ====
