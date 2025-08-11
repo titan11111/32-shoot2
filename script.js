@@ -12,6 +12,17 @@ const startButton = document.getElementById('start-button');
 const background = document.getElementById('background');
 const overlay = document.getElementById('overlay');
 const bgmToggle = document.getElementById('bgm-toggle');
+const deviceSelect = document.getElementById('device-select');
+const pcButton = document.getElementById('pc-button');
+const mobileButton = document.getElementById('mobile-button');
+const instructions = document.getElementById('instructions');
+const mobileControls = document.getElementById('mobile-controls');
+const btnLeft = document.getElementById('btn-left');
+const btnRight = document.getElementById('btn-right');
+const btnShoot = document.getElementById('btn-shoot');
+
+let controlMode = 'pc';
+let useSwipeControls = false;
 
 let difficulty = 'normal';
 let bossHPBase = 100;
@@ -30,6 +41,37 @@ function playBGM(file, loop = true) {
 
 // Title screen BGM
 playBGM('title_bgm.mp3');
+
+pcButton.addEventListener('click', () => {
+  controlMode = 'pc';
+  instructions.textContent = '操作: ←→キーで移動 / Spaceでショット';
+  deviceSelect.style.display = 'none';
+  startScreen.style.display = 'flex';
+});
+
+mobileButton.addEventListener('click', () => {
+  controlMode = 'mobile';
+  instructions.textContent = '操作: ボタンで移動 / ショット';
+  deviceSelect.style.display = 'none';
+  startScreen.style.display = 'flex';
+});
+
+function setupMobileButtons() {
+  const startMove = (key) => (e) => { e.preventDefault(); e.stopPropagation(); keys[key] = true; };
+  const stopMove = (key) => (e) => { e.preventDefault(); e.stopPropagation(); keys[key] = false; };
+  btnLeft.addEventListener('touchstart', startMove('ArrowLeft'), { passive: false });
+  btnLeft.addEventListener('touchend', stopMove('ArrowLeft'));
+  btnLeft.addEventListener('mousedown', startMove('ArrowLeft'));
+  btnLeft.addEventListener('mouseup', stopMove('ArrowLeft'));
+  btnRight.addEventListener('touchstart', startMove('ArrowRight'), { passive: false });
+  btnRight.addEventListener('touchend', stopMove('ArrowRight'));
+  btnRight.addEventListener('mousedown', startMove('ArrowRight'));
+  btnRight.addEventListener('mouseup', stopMove('ArrowRight'));
+  btnShoot.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); shoot('normal'); }, { passive: false });
+  btnShoot.addEventListener('mousedown', (e) => { e.preventDefault(); e.stopPropagation(); shoot('normal'); });
+}
+
+setupMobileButtons();
 
 // ==== SVG キャッシュ機構 ====
 const svgCache = {};
@@ -133,6 +175,11 @@ function startGame() {
   overlay.style.display = 'none';
   overlay.classList.remove('flash');
   gameContainer.style.display = 'block';
+  if (controlMode === 'mobile') {
+    mobileControls.style.display = 'block';
+  } else {
+    mobileControls.style.display = 'none';
+  }
   scoreDisplay.style.display = 'block';
   stageDisplay.style.display = 'block';
   document.getElementById('countdown').style.display = 'block';
@@ -209,13 +256,13 @@ document.addEventListener('keyup', (e) => {
 
 // ==== スマホ：スワイプ上下移動／タップ発射 ====
 gameContainer.addEventListener('touchstart', (e) => {
-  if (e.target.closest('#game-over')) return;
+  if (!useSwipeControls || e.target.closest('#mobile-controls') || e.target.closest('#game-over')) return;
   e.preventDefault();
   touchStartY = e.touches[0].clientY;
   touchStartX = e.touches[0].clientX;
 }, { passive: false });
 gameContainer.addEventListener('touchmove', (e) => {
-  if (e.target.closest('#game-over')) return;
+  if (!useSwipeControls || e.target.closest('#mobile-controls') || e.target.closest('#game-over')) return;
   e.preventDefault();
   const currentY = e.touches[0].clientY;
   const currentX = e.touches[0].clientX;
@@ -233,7 +280,7 @@ gameContainer.addEventListener('touchmove', (e) => {
   touchStartX = currentX;
 }, { passive: false });
 gameContainer.addEventListener('touchend', (e) => {
-  if (e.target.closest('#game-over')) return;
+  if (!useSwipeControls || e.target.closest('#mobile-controls') || e.target.closest('#game-over')) return;
   e.preventDefault();
   shoot('normal');
 }, { passive: false });
@@ -764,6 +811,9 @@ function updateScore(amount) {
 function endGame() {
   if (gameOver) return;
   gameOver = true;
+  if (controlMode === 'mobile') {
+    mobileControls.style.display = 'none';
+  }
   setScrolling(false);
   scoreDisplay.style.display = 'none';
   stageDisplay.style.display = 'none';
