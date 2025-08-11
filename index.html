@@ -6,8 +6,15 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- デバイス選択 -->
+  <div id="device-select">
+    <h2>プレイ環境を選択</h2>
+    <button id="pc-button">パソコン</button>
+    <button id="mobile-button">携帯</button>
+  </div>
+
   <!-- スタート画面 -->
-  <div id="start-screen">
+  <div id="start-screen" style="display: none;">
     <h1>ギャラクシー<br>ストライカーX</h1>
     <p id="instructions">操作: ←→キーで移動 / Spaceでショット</p>
     <label for="difficulty">難易度:</label>
@@ -35,6 +42,15 @@
       <button id="title-button">タイトルに戻る</button>
     </div>
     <audio id="bgm" loop></audio>
+
+    <!-- スマホ用ボタン操作 -->
+    <div id="mobile-controls">
+      <div id="move-buttons">
+        <button id="btn-left">←</button>
+        <button id="btn-right">→</button>
+      </div>
+      <button id="btn-shoot">●</button>
+    </div>
   </div>
 
   <script src="script.js"></script>
