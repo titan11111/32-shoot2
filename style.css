@@ -1,347 +1,248 @@
-body {
-    margin: 0;
-    overflow: hidden;
-    font-family: sans-serif;
-    background-color: black;
-    color: white;
-  }
+/* === Neo-Arc HUD Skin (CSS only) =========================================
+   - HTML/JSは既存そのまま（id/class変更なし）
+   - 主要テーマは変数で調整可能
+========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Noto+Sans+JP:wght@400;700&display=swap');
 
-#device-select {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    background: black;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
+:root{
+  --bg-0:#030611;
+  --bg-1:#0a1224;
+  --neon-cyan:#00f2fe;
+  --neon-blue:#4facfe;
+  --neon-mag:#ff00cc;
+  --neon-yellow:#ffcc00;
+  --hud-glass:rgba(255,255,255,0.06);
+  --hud-border:rgba(255,255,255,0.22);
+  --hud-shadow:0 0 16px rgba(0,255,255,0.25), 0 0 48px rgba(0,255,255,0.15);
+  --text:#eaf6ff;
+}
 
-#device-select button {
-    margin: 20px;
-    padding: 20px 40px;
-    font-size: 32px;
-    cursor: pointer;
-  }
+/* Base ------------------------------------------------------------ */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; overflow:hidden;
+  font-family:'Noto Sans JP','Segoe UI',system-ui,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(1200px 800px at 110% -10%, rgba(0,255,255,0.10), transparent 60%),
+    radial-gradient(900px 600px at -10% 120%, rgba(255,0,128,0.08), transparent 60%),
+    linear-gradient(180deg, var(--bg-1), var(--bg-0));
+}
 
-  #start-screen {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    background: black;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 999;
-  }
+/* 画面のビネット＋CRTライン（演出） */
+body::after{
+  content:"";
+  position:fixed; inset:0; pointer-events:none; z-index:1;
+  background:
+    radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.65) 100%),
+    repeating-linear-gradient(180deg, rgba(255,255,255,0.02) 0 1px, transparent 1px 3px);
+  mix-blend-mode:normal;
+}
 
-  #instructions {
-    margin-top: 20px;
-    font-size: 24px;
-  }
+/* デバイス選択/スタート画面 -------------------------------------- */
+#device-select, #start-screen{
+  position:fixed; inset:0; z-index:1000;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  background:
+    radial-gradient(1000px 700px at 50% -10%, rgba(0,255,255,0.10), transparent 60%),
+    linear-gradient(180deg, rgba(5,10,25,0.95), rgba(2,4,9,0.95));
+  backdrop-filter: blur(8px);
+  gap:24px;
+}
 
-  #difficulty {
-    margin-top: 10px;
-    font-size: 24px;
-  }
+/* タイトルをグリッチっぽく */
+#start-screen h1{
+  font-family:'Orbitron',sans-serif;
+  font-size:min(14vw,110px);
+  line-height:1.0; letter-spacing:.02em;
+  color:var(--neon-yellow);
+  text-shadow:
+    0 0 10px #ff7700, 0 0 28px #ff0000,
+    0 0 40px #ffff00, 0 0 60px #ff7700;
+  animation: titleGlow 2.6s ease-in-out infinite;
+}
+@keyframes titleGlow{
+  0%,100%{ filter: drop-shadow(0 0 0 rgba(255,255,255,0.0)); }
+  50%{ filter: drop-shadow(0 0 18px rgba(255,255,255,0.35)); }
+}
 
-  #start-screen h1 {
-    font-size: 100px;
-    color: #ffcc00;
-    text-shadow: 0 0 10px #ff0000, 0 0 20px #ff7700, 0 0 30px #ffff00;
-  }
+#instructions{font-size:20px; opacity:.9}
+#difficulty{
+  font-size:18px; padding:6px 10px; border-radius:10px; border:1px solid var(--hud-border);
+  background:rgba(255,255,255,0.05); color:var(--text);
+}
 
-  #start-button {
-    padding: 30px 60px;
-    font-size: 72px;
-    margin-top: 40px;
-    cursor: pointer;
-    background-color: #ffcc00;
-    color: black;
-    border: 3px solid #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 10px #ff7700, 0 0 20px #ff0000;
-  }
-  
-  #game-container {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    display: none;
-    touch-action: none;
-  }
+/* ボタン共通：ネオンフレーム */
+#device-select button, #start-button, #restart-button, #title-button, #bgm-toggle, #mobile-controls button{
+  --btn-pad-y: 14px; --btn-pad-x: 28px;
+  position:relative; cursor:pointer; user-select:none;
+  padding:var(--btn-pad-y) var(--btn-pad-x);
+  font:700 18px/1.1 'Orbitron', sans-serif;
+  color:var(--text);
+  background: linear-gradient(180deg, rgba(0,244,255,0.12), rgba(0,244,255,0.04));
+  border:1px solid var(--hud-border);
+  border-radius:14px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), var(--hud-shadow);
+  transition: transform .08s ease, box-shadow .2s ease, filter .2s ease;
+}
+#device-select button:hover, #start-button:hover, #restart-button:hover, #title-button:hover, #bgm-toggle:hover{
+  filter:saturate(1.2) brightness(1.1);
+}
+#device-select button:active, #start-button:active, #restart-button:active, #title-button:active{
+  transform: translateY(1px) scale(0.99);
+}
 
-  #mobile-controls {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    display: none;
-    pointer-events: none;
-  }
+/* ゲーム画面 ------------------------------------------------------ */
+#game-container{
+  position:relative; width:100vw; height:100vh; overflow:hidden; touch-action:none; z-index:0;
+  font-feature-settings:"palt";
+}
 
-  #mobile-controls button {
-    width: 60px;
-    height: 60px;
-    font-size: 24px;
-    opacity: 0.7;
-    pointer-events: auto;
-  }
+/* 背景：既存の火山スクロールに、スピードライン＋ネビュラを足す（CSSのみ） */
+#background{
+  position:absolute; inset:0; width:200%; height:100%;
+  background:
+    radial-gradient(1200px 800px at 70% -20%, rgba(0,255,255,0.08), transparent 60%),
+    radial-gradient(900px 600px at -10% 120%, rgba(255,0,128,0.06), transparent 60%),
+    repeating-linear-gradient(-12deg, rgba(255,255,255,0.05) 0 2px, transparent 2px 90px),
+    url("images/volcano.svg") repeat-x bottom;
+  background-size: cover, cover, auto 100%, cover;       /* 既存の画像指定は維持 */
+  animation: scrollBackground 20s linear infinite;       /* 既存アニメ維持 */
+  filter: saturate(1.1) contrast(1.05);
+}
+@keyframes scrollBackground{
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
 
-  #move-buttons {
-    position: absolute;
-    left: 20px;
-    bottom: 20px;
-  }
+/* 画面フラッシュ＆ビネット強化 */
+#overlay{ position:absolute; inset:0; background:black; opacity:0; z-index:15; pointer-events:none; }
+.flash{ animation: flashFade 0.9s forwards; }
+@keyframes flashFade{ 0%{ background:white; opacity:1 } 100%{ background:black; opacity:1 } }
 
-  #move-buttons button {
-    margin-right: 10px;
-  }
+/* プレイヤー ------------------------------------------------------ */
+#player{ position:absolute; left:150px; top:50%; transform:translateY(-50%) rotate(90deg); width:168px; height:112px; z-index:5; filter: drop-shadow(0 0 12px rgba(79,172,254,.45)); }
+#player img{ width:100%; height:100%; display:block }
 
-  #btn-shoot {
-    position: absolute;
-    right: 20px;
-    bottom: 20px;
-  }
-  
-  #background {
-    position: absolute;
-    width: 200%;
-    height: 100%;
-    background: url("images/volcano.svg") repeat-x bottom;
-    background-size: cover;
-    animation: scrollBackground 20s linear infinite;
-  }
+/* ショット系（発光強化） */
+.bullet{
+  position:absolute; width:16px; height:6px;
+  background: linear-gradient(90deg, #fff, var(--neon-yellow));
+  box-shadow: 0 0 10px rgba(255,204,0,0.9), 0 0 26px rgba(255,204,0,0.5);
+  border-radius:3px;
+}
+.bullet-strong{
+  position:absolute; width:34px; height:6px;
+  background: linear-gradient(90deg, #fff, var(--neon-cyan));
+  box-shadow: 0 0 12px rgba(0,242,254,0.9), 0 0 28px rgba(0,242,254,0.5);
+  border-radius:3px;
+}
+.beam{
+  position:absolute; width:300px; height:16px;
+  background: linear-gradient(90deg, rgba(255,255,255,.95), var(--neon-cyan), rgba(255,255,255,.95));
+  box-shadow: 0 0 8px var(--neon-cyan), 0 0 16px var(--neon-cyan), 0 0 48px rgba(0,242,254,.6);
+  border-radius:8px;
+  animation: beamGlow .35s alternate infinite;
+}
+@keyframes beamGlow{
+  from{ box-shadow: 0 0 8px var(--neon-cyan), 0 0 16px var(--neon-cyan), 0 0 28px rgba(0,242,254,.6) }
+  to  { box-shadow: 0 0 16px var(--neon-cyan), 0 0 36px var(--neon-cyan), 0 0 56px rgba(0,242,254,.75) }
+}
+.homing{
+  position:absolute; width:18px; height:18px; border-radius:50%;
+  background: radial-gradient(circle at 35% 35%, #fff 30%, orange 31% 55%, rgba(255,165,0,.6) 56% 100%);
+  box-shadow: 0 0 12px rgba(255,165,0,0.9), 0 0 36px rgba(255,165,0,0.4);
+  animation: homingPulse 0.9s ease-in-out infinite;
+}
+@keyframes homingPulse{
+  0%,100%{ transform: scale(1); filter: brightness(1) }
+  50%{ transform: scale(1.12); filter: brightness(1.25) }
+}
 
-  @keyframes scrollBackground {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-  
-  #player {
-    position: absolute;
-    left: 150px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 168px;
-    height: 112px;
-    z-index: 5;
-  }
-  #player img {
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
-  
-  .bullet, .bullet-strong {
-    position: absolute;
-    height: 6px;
-  }
-  .bullet {
-    width: 15px;
-    background: yellow;
-  }
-  .bullet-strong {
-    width: 30px;
-    background: cyan;
-  }
-  
-.enemy, .enemy-strong, .enemy-fast, .enemy-shooter, .boss {
-    position: absolute;
-    border-radius: 5px;
-    overflow: hidden;
-  }
-.enemy, .enemy-fast {
-    width: 80px;
-    height: 60px;
-  }
-.enemy-strong, .enemy-shooter {
-    width: 100px;
-    height: 80px;
-  }
-.boss {
-    width: 320px;
-    height: 240px;
-  }
-.enemy img, .enemy-strong img, .enemy-fast img, .enemy-shooter img, .boss img {
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
-  
-  .explosion {
-    position: absolute;
-    width: 40px;
-    height: 40px;
-    background: orange;
-    border-radius: 50%;
-    animation: explode 0.3s ease-out forwards;
-    z-index: 10;
-  }
-  
-  @keyframes explode {
-    0% {
-      opacity: 1;
-      transform: scale(1);
-    }
-    100% {
-      opacity: 0;
-      transform: scale(2);
-    }
-  }
-  
-  #score {
-    position: absolute;
-    top: 10px;
-    left: 20px;
-    font-size: 20px;
-    z-index: 10;
-  }
+/* 敵・ボス -------------------------------------------------------- */
+.enemy, .enemy-strong, .enemy-fast, .enemy-shooter, .boss{
+  position:absolute; border-radius:8px; overflow:hidden;
+  filter: drop-shadow(0 0 10px rgba(0,0,0,.4)) drop-shadow(0 0 16px rgba(79,172,254,.25));
+}
+.enemy, .enemy-fast{ width:80px; height:60px }
+.enemy-strong, .enemy-shooter{ width:100px; height:80px }
+.boss{ width:320px; height:240px }
+.enemy img, .enemy-strong img, .enemy-fast img, .enemy-shooter img, .boss img{ width:100%; height:100%; display:block }
 
-  #stage {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 20px;
-    z-index: 10;
-  }
+.boss.warning{ animation: bossFlash .5s steps(2,start) }
+@keyframes bossFlash{ 0%,100%{ opacity:1 } 50%{ opacity:.35; filter: hue-rotate(20deg) } }
 
-  #countdown {
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    font-size: 20px;
-    z-index: 10;
-  }
+/* 爆発を少しリッチに */
+.explosion{
+  position:absolute; width:44px; height:44px; border-radius:50%;
+  background: radial-gradient(circle, #fff 0 20%, #ffb84d 21% 60%, #ff6b00 61% 100%);
+  box-shadow: 0 0 18px rgba(255,107,0,.9), 0 0 44px rgba(255,184,77,.6);
+  animation: explode .32s ease-out forwards;
+  z-index:10;
+}
+@keyframes explode{ 0%{ opacity:1; transform:scale(0.8) } 100%{ opacity:0; transform:scale(2.2) } }
 
-  #bgm-toggle {
-    position: absolute;
-    top: 40px;
-    right: 20px;
-    z-index: 10;
-    padding: 5px 10px;
-    font-size: 16px;
-  }
-  
-  #game-over {
-    display: none;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: red;
-    z-index: 20;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
+/* 敵弾 */
+.enemy-bullet{
+  position:absolute; width:30px; height:12px; border-radius:6px;
+  background: linear-gradient(90deg, #ff9aa2, #ff003c);
+  box-shadow: 0 0 10px rgba(255,0,60,.85), 0 0 30px rgba(255,0,60,.4);
+}
 
-  #game-over-text {
-    font-size: 64px;
-    animation: fadeIn 2s forwards;
-  }
+/* バリア（当たり3回） */
+.barrier{
+  position:absolute; top:-10px; left:-10px; width:188px; height:132px; border-radius:50%;
+  border:2px solid var(--neon-cyan);
+  box-shadow: inset 0 0 12px rgba(0,242,254,.6), 0 0 18px rgba(0,242,254,.6), 0 0 48px rgba(0,242,254,.35);
+  pointer-events:none;
+}
 
-  #final-score {
-    margin-top: 20px;
-    font-size: 32px;
-  }
+/* HUD ------------------------------------------------------------- */
+#score,#stage,#countdown{
+  position:absolute; z-index:10; font:600 18px/1 'Orbitron',sans-serif; letter-spacing:.04em;
+  padding:10px 14px; border-radius:12px;
+  color:var(--text);
+  background: var(--hud-glass);
+  border:1px solid var(--hud-border);
+  box-shadow: var(--hud-shadow), inset 0 0 0 1px rgba(255,255,255,0.06);
+  backdrop-filter: blur(8px);
+}
+#score{ top:12px; left:20px }
+#stage{ top:12px; left:50%; transform:translateX(-50%) }
+#countdown{ top:12px; right:20px }
 
-  #restart-button, #title-button {
-    margin-top: 20px;
-    font-size: 24px;
-    padding: 10px 20px;
-    cursor: pointer;
-  }
+#bgm-toggle{
+  position:absolute; top:52px; right:20px; z-index:10; font-size:14px; padding:8px 12px;
+}
 
-  #overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: black;
-    opacity: 0;
-    z-index: 15;
-    pointer-events: none;
-  }
+/* モバイル操作 ---------------------------------------------------- */
+#mobile-controls{
+  position:absolute; inset:0; display:none; pointer-events:none; z-index:12;
+}
+#mobile-controls button{
+  width:64px; height:64px; font-size:22px; opacity:0.85; pointer-events:auto;
+  backdrop-filter: blur(6px);
+}
+#move-buttons{ position:absolute; left:20px; bottom:20px }
+#move-buttons button{ margin-right:10px }
+#btn-shoot{ position:absolute; right:20px; bottom:20px }
 
-  .flash {
-    animation: flashFade 1s forwards;
-  }
+/* ゲームオーバー -------------------------------------------------- */
+#game-over{
+  display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  z-index:20; flex-direction:column; align-items:center; text-align:center;
+  color:#ff4455; gap:16px;
+  text-shadow: 0 0 12px rgba(255,68,85,0.75);
+}
+#game-over-text{ font-size:min(12vw,68px); animation: fadeIn 1.4s forwards }
+#final-score{ font-size:28px }
+#restart-button,#title-button{ margin-top:6px }
 
-  @keyframes flashFade {
-    0% { background: white; opacity: 1; }
-    100% { background: black; opacity: 1; }
-  }
+/* 既存アニメ維持 */
+@keyframes fadeIn{ from{opacity:0} to{opacity:1} }
 
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  .item {
-    position: absolute;
-    width: 60px;
-    height: 60px;
-  }
-  .item img {
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
-
-  .beam {
-    position: absolute;
-    width: 300px;
-    height: 16px;
-    background: linear-gradient(90deg, rgba(255,255,255,0.9), #0ff, rgba(255,255,255,0.9));
-    box-shadow: 0 0 8px #0ff, 0 0 16px #0ff, 0 0 24px #0ff;
-    border-radius: 8px;
-    animation: beamGlow 0.3s alternate infinite;
-  }
-
-  @keyframes beamGlow {
-    from { box-shadow: 0 0 8px #0ff, 0 0 16px #0ff, 0 0 24px #0ff; }
-    to { box-shadow: 0 0 16px #0ff, 0 0 32px #0ff, 0 0 48px #0ff; }
-  }
-
-  .homing {
-    position: absolute;
-    width: 18px;
-    height: 18px;
-    background: orange;
-    border-radius: 50%;
-  }
-
-  .barrier {
-    position: absolute;
-    top: -10px;
-    left: -10px;
-    width: 188px;
-    height: 132px;
-    border: 3px solid cyan;
-    border-radius: 50%;
-    pointer-events: none;
-  }
-
-  .enemy-bullet {
-    position: absolute;
-    width: 30px;
-    height: 12px;
-    background: red;
-  }
-
-  .boss.warning {
-    animation: bossFlash 0.5s steps(2, start);
-  }
-
-  @keyframes bossFlash {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-  
+/* アクセシビリティ：動き抑制 */
+@media (prefers-reduced-motion: reduce){
+  #background, .beam, .homing, .boss.warning, .flash, #start-screen h1{ animation:none }
+}
